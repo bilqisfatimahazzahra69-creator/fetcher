@@ -1,0 +1,8 @@
+{
+    "name": "fetcher-frontend",
+    "version": "1.0.0",
+    "description": "Static frontend for social media downloader",
+    "scripts": {
+        "start": "npx -y serve -l ${PORT:-3000} ."
+    }
+}

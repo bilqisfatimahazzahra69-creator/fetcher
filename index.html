@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetcher - Download Video TikTok, IG, & YouTube Tanpa Watermark</title>
+    <meta name="description"
+        content="Download video TikTok, Instagram, YouTube, dan Twitter (X) tanpa watermark kualitas HD secara gratis dan cepat dengan Fetcher AI.">
+    <meta name="keywords"
+        content="download video tiktok, tiktok downloader, ig downloader, youtube downloader, download tiktok tanpa watermark, fetcher ai">
+    <link rel="canonical" href="https://fetcher.example.com">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fetcher.example.com">
+    <meta property="og:title" content="Fetcher - Premium Media Downloader">
+    <meta property="og:description"
+        content="Download media favoritmu dari TikTok, Instagram, dan YouTube dengan satu klik. Tanpa watermark, kualitas HD.">
+    <meta property="og:image" content="https://fetcher.example.com/favicon.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://fetcher.example.com">
+    <meta property="twitter:title" content="Fetcher - Premium Media Downloader">
+    <meta property="twitter:description"
+        content="Download video TikTok, IG, & YT tanpa watermark kualitas asli. Cepat dan gratis.">
+    <meta property="twitter:image" content="https://fetcher.example.com/favicon.png">
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Fetcher Downloader",
+      "url": "https://fetcher.example.com",
+      "description": "Premium Social Media Downloader for TikTok, Instagram, and YouTube.",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0.00",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="background-decor">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                <span>Fetcher</span>
+            </div>
+            <h1>Social Media <span class="gradient-text" data-i18n="downloader">Downloader</span></h1>
+            <p class="subtitle" data-i18n="subtitle">Tempel tautan video Anda dan biarkan Fetcher melakukan sisanya.</p>
+        </header>
+
+        <main>
+            <div class="input-card glass">
+                <div class="input-group">
+                    <i class="fas fa-link"></i>
+                    <input type="text" id="urlInput" placeholder="Masukkan URL (TikTok, IG, YouTube...)"
+                        data-i18n-placeholder="input_placeholder" autocomplete="off">
+                    <button id="clearBtn" class="hidden"><i class="fas fa-times"></i></button>
+                    <button id="fetchBtn">
+                        <span class="btn-text" data-i18n="fetch_btn">Ambil Media</span>
+                        <div class="loader-inner hidden"></div>
+                    </button>
+                </div>
+            </div>
+
+            <div id="apiConfig" class="glass-mini">
+                <i class="fas fa-cog"></i>
+                <input type="text" id="apiUrlInput"
+                    placeholder="API URL Railway (e.g. https://api-production.up.railway.app)"
+                    data-i18n-placeholder="api_placeholder">
+                <span class="tooltip" data-i18n="api_tooltip">Klik untuk ubah API URL</span>
+            </div>
+
+            <div id="resultsSkeleton" class="hidden">
+                <div class="result-card glass skeleton-card">
+                    <div class="skeleton-header">
+                        <div class="skeleton-thumb"></div>
+                        <div class="skeleton-info">
+                            <div class="skeleton-line title"></div>
+                            <div class="skeleton-line sub"></div>
+                            <div class="skeleton-line stats"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resultsContainer" class="hidden">
+                <div class="result-card glass">
+                    <div class="result-header">
+                        <div class="thumbnail-wrapper">
+                            <img id="mediaThumbnail" src="" alt="Thumbnail">
+                            <div class="duration-badge" id="mediaDuration">00:00</div>
+                        </div>
+                        <div class="info-content">
+                            <h2 id="mediaTitle" data-i18n="media_title">Judul Video</h2>
+                            <p id="mediaUploader" class="uploader-name">@username</p>
+                            <div class="stats">
+                                <span id="mediaPlatform" class="badge">Platform</span>
+                                <span id="mediaViews" class="stat-item"><i class="far fa-eye"></i> 0</span>
+                                <span id="mediaLikes" class="stat-item"><i class="far fa-heart"></i> 0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="download-sections">
+                        <div class="section">
+                            <h3 data-i18n="section_video"><i class="fas fa-video"></i> Video</h3>
+                            <div id="videoFormats" class="format-grid">
+                                <!-- Formats injected here -->
+                            </div>
+                        </div>
+                        <div class="section">
+                            <h3 data-i18n="section_audio"><i class="fas fa-music"></i> Audio</h3>
+                            <div id="audioFormats" class="format-grid">
+                                <!-- Formats injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="errorState" class="hidden glass-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <p id="errorMessage" data-i18n="error_generic">Terjadi kesalahan. Pastikan URL benar.</p>
+            </div>
+
+            <div id="historySection" class="hidden">
+                <div class="history-header">
+                    <h3 data-i18n="history_title"><i class="fas fa-history"></i> Riwayat Terakhir</h3>
+                    <button id="clearHistoryBtn" data-i18n="history_clear">Hapus Semua</button>
+                </div>
+                <div id="historyList" class="history-grid">
+                    <!-- History items here -->
+                </div>
+            </div>
+
+            <!-- SEO Semantic Content Section -->
+            <section class="seo-content glass">
+                <article>
+                    <h2 data-i18n="seo_title">Mengapa Memilih Fetcher Downloader?</h2>
+                    <p data-i18n="seo_desc">Fetcher adalah alat downloader video sosial media terbaik yang mendukung
+                        berbagai platform
+                        populer. Kami memberikan kemudahan bagi Anda untuk menyimpan konten favorit langsung ke
+                        perangkat.</p>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <h4 data-i18n="feat_1_title">Tanpa Watermark</h4>
+                            <p data-i18n="feat_1_desc">Dapatkan video murni tanpa tanda air mengganggu.</p>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <h4 data-i18n="feat_2_title">Super Cepat</h4>
+                            <p data-i18n="feat_2_desc">Proses download dan penggabungan video secepat kilat.</p>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-mobile-alt"></i>
+                            <h4 data-i18n="feat_3_title">Mobile Friendly</h4>
+                            <p data-i18n="feat_3_desc">Tampilan yang nyaman digunakan di HP maupun Desktop.</p>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </main>
+
+        <footer>
+            <p data-i18n="footer_copy">&copy; 2026 Fetcher AI. Project for Railway Deployment.</p>
+            <button id="openReportBtn" class="glass-mini-btn"><i class="fas fa-bug"></i> <span
+                    data-i18n="bug_report">Laporkan Bug</span></button>
+        </footer>
+    </div>
+
+    <!-- Bug Report Modal -->
+    <div id="reportModal" class="modal hidden">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2><i class="fas fa-bug"></i> <span data-i18n="report_title">Laporkan Masalah</span></h2>
+                <button id="closeReportBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="reportMsg" data-i18n-placeholder="report_placeholder"
+                    placeholder="Jelaskan masalahnya..."></textarea>
+                <div class="file-upload">
+                    <label for="reportFile">
+                        <i class="fas fa-image"></i> <span data-i18n="report_screenshot">Ambil Screenshot</span>
+                        <input type="file" id="reportFile" accept="image/*" hidden>
+                    </label>
+                    <span id="fileNameDisplay" class="file-name" data-i18n="report_no_file">Tidak ada file
+                        dipilih</span>
+                </div>
+                <button id="sendReportBtn">
+                    <span class="btn-text" data-i18n="report_send">Kirim Laporan</span>
+                    <div class="loader-inner hidden"></div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast hidden">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg" data-i18n="toast_success">Pesan Berhasil</span>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
