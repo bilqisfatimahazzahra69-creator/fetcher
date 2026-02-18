@@ -185,8 +185,12 @@
 
         <footer>
             <p data-i18n="footer_copy">&copy; 2026 Fetcher AI. Project for Railway Deployment.</p>
-            <button id="openReportBtn" class="glass-mini-btn"><i class="fas fa-bug"></i> <span
-                    data-i18n="bug_report">Laporkan Bug</span></button>
+            <div class="footer-links">
+                <a href="api.html" class="glass-mini-btn" style="text-decoration: none;"><i class="fas fa-code"></i>
+                    Developers / API</a>
+                <button id="openReportBtn" class="glass-mini-btn"><i class="fas fa-bug"></i> <span
+                        data-i18n="bug_report">Laporkan Bug</span></button>
+            </div>
         </footer>
     </div>
 
@@ -221,7 +225,7 @@
         <span id="toastMsg" data-i18n="toast_success">Pesan Berhasil</span>
     </div>
 
-    <script src="config.js"></script>
+    <script src="env-config.js"></script>
     <script src="script.js"></script>
 </body>
 

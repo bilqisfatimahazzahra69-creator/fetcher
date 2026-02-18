@@ -3,6 +3,6 @@
     "version": "1.0.0",
     "description": "Static frontend for social media downloader",
     "scripts": {
-        "start": "node setup-env.js && npx -y serve -l ${PORT:-3000} ."
+        "start": "node env-sync.js && npx -y serve -l ${PORT:-3000} ."
     }
 }

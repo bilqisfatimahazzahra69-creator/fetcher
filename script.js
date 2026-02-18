@@ -202,42 +202,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const videoFormats = document.getElementById('videoFormats');
     const audioFormats = document.getElementById('audioFormats');
 
-    // --- API CONFIG ---
-    const LOCAL_DEFAULT_PORT = 7000;
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    // --- API CONFIG & SECURITY ---
+    // Cek jembatan .env (env-config.js)
+    const envUrl = window._env_?.API_BASE_URL;
+    let API_BASE_URL = envUrl || window.location.origin;
 
-    // Prioritaskan .env (via generated config.js) atau localStorage
-    const envUrl = window.ENV?.API_BASE_URL;
-    let API_BASE_URL = localStorage.getItem('fetcher_api_url') || envUrl;
-
-    if (!API_BASE_URL) {
-        API_BASE_URL = isLocal ? `http://localhost:${LOCAL_DEFAULT_PORT}` : window.location.origin;
-    }
-
-    // Auto-fix jika protocol lupa ditulis di .env
+    // Tambah protokol jika cuma domain di .env
     if (API_BASE_URL && !API_BASE_URL.startsWith('http') && !API_BASE_URL.includes('localhost')) {
-        API_BASE_URL = `https://${API_BASE_URL}`;
+        API_BASE_URL = `https://${API_BASE_URL.replace(/\/$/, "")}`;
     }
 
-    apiUrlInput.value = API_BASE_URL;
+    let AUTH_REQUIRED = false;
 
-    async function refreshConfig() {
+    async function initConfig() {
         try {
+            // Gunakan API_BASE_URL yang sudah fix dari .env
             const res = await fetch(`${API_BASE_URL}/api/config`);
             if (res.ok) {
                 const config = await res.json();
-                if (config.PUBLIC_API_URL && !isLocal && !localStorage.getItem('fetcher_api_url')) {
-                    API_BASE_URL = config.PUBLIC_API_URL;
-                    apiUrlInput.value = API_BASE_URL;
-                }
+                AUTH_REQUIRED = config.AUTH_REQUIRED;
+                if (AUTH_REQUIRED) console.log('🔐 API Key Protection is Active.');
             }
         } catch (e) { }
     }
-    refreshConfig();
+    initConfig();
+
+    // Sembunyikan input API URL jika tidak di localhost (Security)
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const apiConfigEl = document.getElementById('apiConfig');
+        if (apiConfigEl) apiConfigEl.style.display = 'none';
+    }
 
     apiUrlInput.addEventListener('change', (e) => {
         API_BASE_URL = e.target.value.trim().replace(/\/$/, "");
-        localStorage.setItem('fetcher_api_url', API_BASE_URL);
     });
 
     // --- UX HELPERS ---
@@ -300,13 +297,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setLoading(true);
 
+        const isAudioOnly = url.includes('music.youtube.com') || url.includes('music.apple.com');
+
         try {
-            const response = await fetch(`${API_BASE_URL}/api/download?url=${encodeURIComponent(url)}`);
+            const apiPath = `${API_BASE_URL}/api/download?url=${encodeURIComponent(url)}`;
+            const response = await fetch(apiPath);
             const data = await response.json();
 
             if (!response.ok) throw new Error(data.message || translations[currentLang].error_generic);
 
-            renderResults(data);
+            renderResults(data, isAudioOnly);
             addToHistory(data);
         } catch (err) {
             showError(err.message);
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function renderResults(data) {
+    function renderResults(data, isAudioOnly = false) {
         mediaThumbnail.src = data.thumbnail || 'https://via.placeholder.com/300x200?text=No+Thumbnail';
         mediaTitle.textContent = data.title;
         mediaUploader.textContent = data.uploader ? `@${data.uploader}` : 'Platform Media';
@@ -329,6 +329,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         videoFormats.innerHTML = '';
         audioFormats.innerHTML = '';
+
+        // Handle Audio-Only (YouTube Music)
+        const videoSection = videoFormats.closest('.section');
+        if (isAudioOnly) {
+            if (videoSection) videoSection.style.display = 'none';
+        } else {
+            if (videoSection) videoSection.style.display = 'block';
+        }
 
         const isSlide = data.platform?.includes('Slide') || data.platform?.includes('Photo');
 
