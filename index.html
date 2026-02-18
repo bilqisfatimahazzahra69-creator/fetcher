@@ -83,13 +83,8 @@
                 </div>
             </div>
 
-            <div id="apiConfig" class="glass-mini">
-                <i class="fas fa-cog"></i>
-                <input type="text" id="apiUrlInput"
-                    placeholder="API URL Railway (e.g. https://api-production.up.railway.app)"
-                    data-i18n-placeholder="api_placeholder">
-                <span class="tooltip" data-i18n="api_tooltip">Klik untuk ubah API URL</span>
-            </div>
+            <!-- API Config Hidden (handled via .env) -->
+            <input type="hidden" id="apiUrlInput">
 
             <div id="resultsSkeleton" class="hidden">
                 <div class="result-card glass skeleton-card">

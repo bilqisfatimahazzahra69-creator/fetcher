@@ -203,39 +203,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioFormats = document.getElementById('audioFormats');
 
     // --- API CONFIG & SECURITY ---
-    // Cek jembatan .env (env-config.js)
     const envUrl = window._env_?.API_BASE_URL;
     let API_BASE_URL = envUrl || window.location.origin;
 
-    // Tambah protokol jika cuma domain di .env
-    if (API_BASE_URL && !API_BASE_URL.startsWith('http') && !API_BASE_URL.includes('localhost')) {
-        API_BASE_URL = `https://${API_BASE_URL.replace(/\/$/, "")}`;
+    // FIX PROTOCOL: Pastikan ada http/https (PENTING!)
+    if (API_BASE_URL && !API_BASE_URL.startsWith('http')) {
+        const protocol = API_BASE_URL.includes('localhost') || API_BASE_URL.includes('127.0.0.1') ? 'http://' : 'https://';
+        API_BASE_URL = protocol + API_BASE_URL.replace(/\/$/, "");
     }
+
+    // Hilangkan trailing slash
+    API_BASE_URL = API_BASE_URL.replace(/\/$/, "");
+
+    // Update hidden input if exists
+    if (apiUrlInput) apiUrlInput.value = API_BASE_URL;
 
     let AUTH_REQUIRED = false;
 
     async function initConfig() {
         try {
-            // Gunakan API_BASE_URL yang sudah fix dari .env
             const res = await fetch(`${API_BASE_URL}/api/config`);
             if (res.ok) {
                 const config = await res.json();
                 AUTH_REQUIRED = config.AUTH_REQUIRED;
-                if (AUTH_REQUIRED) console.log('🔐 API Key Protection is Active.');
+                // Sync jika server punya URL publik tapi .env kosong
+                if (config.PUBLIC_API_URL && !envUrl) {
+                    API_BASE_URL = config.PUBLIC_API_URL.replace(/\/$/, "");
+                }
+                if (AUTH_REQUIRED) console.log('🔐 API Key Protection Active');
             }
         } catch (e) { }
     }
     initConfig();
-
-    // Sembunyikan input API URL jika tidak di localhost (Security)
-    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        const apiConfigEl = document.getElementById('apiConfig');
-        if (apiConfigEl) apiConfigEl.style.display = 'none';
-    }
-
-    apiUrlInput.addEventListener('change', (e) => {
-        API_BASE_URL = e.target.value.trim().replace(/\/$/, "");
-    });
 
     // --- UX HELPERS ---
     const showToast = (msg, icon = 'fa-check-circle') => {
