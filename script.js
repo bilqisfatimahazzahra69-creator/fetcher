@@ -131,14 +131,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const elements = document.querySelectorAll('[data-i18n]');
         elements.forEach(el => {
             const key = el.getAttribute('data-i18n');
-            if (translations[lang][key]) {
+            if (translations[lang] && translations[lang][key]) {
                 const icon = el.querySelector('i');
+                const text = translations[lang][key];
+
                 if (icon) {
+                    // Simpan icon, hapus sisanya, lalu tambah text baru
+                    const iconClone = icon.cloneNode(true);
                     el.innerHTML = '';
-                    el.appendChild(icon);
-                    el.appendChild(document.createTextNode(' ' + translations[lang][key]));
+                    el.appendChild(iconClone);
+
+                    // Gunakan innerHTML untuk text jika ada entity (seperti &copy;)
+                    const textSpan = document.createElement('span');
+                    textSpan.innerHTML = ' ' + text;
+                    el.appendChild(textSpan);
                 } else {
-                    el.textContent = translations[lang][key];
+                    el.innerHTML = text; // innerHTML supaya &copy; dkk ter-render
                 }
             }
         });
@@ -146,18 +154,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
         placeholders.forEach(el => {
             const key = el.getAttribute('data-i18n-placeholder');
-            if (translations[lang][key]) {
+            if (translations[lang] && translations[lang][key]) {
                 el.placeholder = translations[lang][key];
             }
         });
     }
 
     async function detectLanguage() {
+        // 1. Cek Parameter URL (?lang=en atau ?lang=id)
+        const urlParams = new URLSearchParams(window.location.search);
+        const langParam = urlParams.get('lang');
+        if (langParam && (langParam === 'en' || langParam === 'id')) {
+            setLanguage(langParam);
+            return;
+        }
+
+        // 2. Cek LocalStorage
         if (localStorage.getItem('fetcher_lang')) {
             setLanguage(localStorage.getItem('fetcher_lang'));
             return;
         }
 
+        // 3. Cek IP (ipapi.co)
         try {
             const response = await fetch('https://ipapi.co/json/');
             const data = await response.json();
@@ -187,11 +205,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- API CONFIG ---
     const LOCAL_DEFAULT_PORT = 7000;
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    let API_BASE_URL = localStorage.getItem('fetcher_api_url');
+
+    // Prioritaskan .env (via generated config.js) atau localStorage
+    const envUrl = window.ENV?.API_BASE_URL;
+    let API_BASE_URL = localStorage.getItem('fetcher_api_url') || envUrl;
 
     if (!API_BASE_URL) {
         API_BASE_URL = isLocal ? `http://localhost:${LOCAL_DEFAULT_PORT}` : window.location.origin;
     }
+
+    // Auto-fix jika protocol lupa ditulis di .env
+    if (API_BASE_URL && !API_BASE_URL.startsWith('http') && !API_BASE_URL.includes('localhost')) {
+        API_BASE_URL = `https://${API_BASE_URL}`;
+    }
+
     apiUrlInput.value = API_BASE_URL;
 
     async function refreshConfig() {
